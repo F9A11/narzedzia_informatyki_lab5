@@ -59,7 +59,6 @@ def test_get_apartment_costs():
             settlement_month=3,
             type='woda',
         ),
-        # Ten sam rok, inny miesiąc (nie powinno być wliczone)
         Bill(
             amount_pln=300.0,
             date_due='2024-04-10',
@@ -79,16 +78,12 @@ def test_get_apartment_costs():
     ]
 
     assert manager.get_apartment_costs(existing_apartment_key, 2024, 3) == 450.0
-
     assert manager.get_apartment_costs(existing_apartment_key, 2024, 5) == 0.0
-
     assert manager.get_apartment_costs('NON_EXISTENT_APARTMENT', 2024, 3) is None
-
-
-
-from src.manager import Manager
-from src.models import Parameters
-from src.models import Bill
+    assert manager.get_apartment_costs(existing_apartment_key, 2024) == 750.0
+    assert manager.get_apartment_costs(existing_apartment_key) == 900.0
+    assert manager.get_apartment_costs(existing_apartment_key, 2024, 13) is None
+    assert manager.get_apartment_costs(existing_apartment_key, 2024, 0) is None
 
 
 def test_apartment_costs_with_optional_parameters():
@@ -131,10 +126,9 @@ def test_apartment_costs_with_optional_parameters():
 
     costs = manager.get_apartment_costs('apart-polanka', 2025, 1)
     assert costs == 910.0
-    
+
     costs = manager.get_apartment_costs('apart-polanka', 2024)
     assert costs == 1372.0
 
     costs = manager.get_apartment_costs('apart-polanka')
     assert costs == 3532.0
-

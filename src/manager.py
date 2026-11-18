@@ -24,17 +24,30 @@ class Manager:
                 return False
         return True
 
-    def get_apartment_costs(self, apartment_key: str, year: int, month: int) -> float | None:
+    def get_apartment_costs(
+        self,
+        apartment_key: str,
+        year: int | None = None,
+        month: int | None = None,
+    ) -> float | None:
         if apartment_key not in self.apartments:
+            return None
+
+        if month is not None and not (1 <= month <= 12):
+            return None
+
+        if month is not None and year is None:
             return None
 
         total_cost = 0.0
         for bill in self.bills:
-            if (
-                bill.apartment == apartment_key
-                and bill.settlement_year == year
-                and bill.settlement_month == month
-            ):
-                total_cost += bill.amount_pln
+            if bill.apartment != apartment_key:
+                continue
+            if year is not None and bill.settlement_year != year:
+                continue
+            if month is not None and bill.settlement_month != month:
+                continue
+
+            total_cost += bill.amount_pln
 
         return float(total_cost)
